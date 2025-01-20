@@ -79,7 +79,8 @@
             border: 1px solid #ccc;
             padding: 8px;
             font-family: Times New Roman, serif;
-            overflow-y: auto;
+            overflow-y: auto;  /* Ermöglicht das Scrollen */
+            max-height: 300px; /* Maximale Höhe des Textfeldes */
         }
         #entryContent img {
             max-width: 100%;
@@ -143,8 +144,8 @@
         const cancelEntry = document.getElementById("cancelEntry");
         const imageUpload = document.getElementById("imageUpload");
         const imageSizeSlider = document.getElementById("imageSizeSlider");
-        let selectedSquare = null;
         const entries = JSON.parse(localStorage.getItem("entries")) || {}; // Lade Einträge aus dem LocalStorage
+        let selectedSquare = null;
 
         // Erstelle Schachbrettfelder (zu Beginn leer)
         for (let row = 0; row < 8; row++) {
@@ -158,6 +159,11 @@
                     square.style.backgroundColor = "#f0d9b5";  // Helles Feld
                 } else {
                     square.style.backgroundColor = "#8b4513";  // Dunkles Feld
+                }
+
+                // Füge den gespeicherten Eintrag oder die Schachfigur hinzu
+                if (entries[`${row}-${col}`]) {
+                    square.textContent = entries[`${row}-${col}`].piece;
                 }
 
                 // Füge einen Event-Listener hinzu, um das Modal zu öffnen
