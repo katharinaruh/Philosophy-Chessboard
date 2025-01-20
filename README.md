@@ -1,6 +1,7 @@
 # Chessboard
 the psychological-philosophical chessboard - a cognitive exchange
 
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -18,34 +19,38 @@ the psychological-philosophical chessboard - a cognitive exchange
         }
         .chessboard {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
+            grid-template-columns: repeat(8, 1fr); /* 8 Spalten */
+            grid-template-rows: repeat(8, 1fr);    /* 8 Reihen */
             width: 480px;
             height: 480px;
             border: 2px solid #333;
             margin-bottom: 20px;
         }
         .square {
-            width: 60px;
-            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 24px;
             cursor: pointer;
         }
+        /* Festlegen der Farben für die Felder (abwechselnd) */
         .square:nth-child(odd) {
-            background-color: #f0d9b5;
+            background-color: #f0d9b5;  /* Helles Feld */
         }
         .square:nth-child(even) {
-            background-color: #8b4513;
+            background-color: #8b4513;  /* Dunkles Feld */
         }
-        .square:nth-child(8n+1):nth-child(odd) {
-            background-color: #8b4513;
-        }
-        .square:nth-child(8n+1):nth-child(even) {
+
+        /* Regel für jede Reihe und Spalte, damit sie abwechselnd farbig sind */
+        .chessboard .square:nth-child(odd):nth-child(odd),
+        .chessboard .square:nth-child(even):nth-child(even) {
             background-color: #f0d9b5;
         }
+        .chessboard .square:nth-child(odd):nth-child(even),
+        .chessboard .square:nth-child(even):nth-child(odd) {
+            background-color: #8b4513;
+        }
+
         .modal {
             position: fixed;
             top: 0;
@@ -255,4 +260,5 @@ the psychological-philosophical chessboard - a cognitive exchange
     </script>
 </body>
 </html>
+
 
