@@ -1,12 +1,11 @@
 # Chessboard
 the psychological-philosophical chessboard - a cognitive exchange
 
-<!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Philosophers and Psychologists Chessboard</title>
+    <title>Schachbrett der Philosophen und Psychologen</title>
     <style>
         body {
             display: flex;
@@ -20,6 +19,7 @@ the psychological-philosophical chessboard - a cognitive exchange
         .chessboard {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
             width: 480px;
             height: 480px;
             border: 2px solid #333;
@@ -34,11 +34,17 @@ the psychological-philosophical chessboard - a cognitive exchange
             font-size: 24px;
             cursor: pointer;
         }
-        .square:nth-child(even) {
+        .square:nth-child(odd) {
             background-color: #f0d9b5;
         }
-        .square:nth-child(odd) {
+        .square:nth-child(even) {
             background-color: #8b4513;
+        }
+        .square:nth-child(8n+1):nth-child(odd) {
+            background-color: #8b4513;
+        }
+        .square:nth-child(8n+1):nth-child(even) {
+            background-color: #f0d9b5;
         }
         .modal {
             position: fixed;
@@ -73,36 +79,63 @@ the psychological-philosophical chessboard - a cognitive exchange
         .entry-title {
             font-weight: bold;
         }
+        #entryContent {
+            width: 100%;
+            min-height: 150px;
+            border: 1px solid #ccc;
+            padding: 8px;
+            font-family: Times New Roman, serif;
+            overflow-y: auto;
+        }
+        #entryContent img {
+            max-width: 100%;
+        }
+        .image-container {
+            margin-bottom: 10px;
+        }
+        #imageSizeSlider {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
-    <h1>Philosophers and Psychologists Chessboard</h1>
+    <h1>Schachbrett der Philosophen und Psychologen</h1>
     <div class="chessboard" id="chessboard"></div>
 
     <div class="modal" id="modal">
         <div class="modal-content">
-            <h2 id="modalTitle">Place a Piece</h2>
-            <label for="pieceType">Choose a Piece:</label>
+            <h2 id="modalTitle">Setze eine Figur</h2>
+            <label for="pieceType">Wähle eine Figur:</label>
             <select id="pieceType">
-                <option value="♔">White King (Philosopher)</option>
-                <option value="♕">White Queen (Philosopher)</option>
-                <option value="♖">White Rook (Philosopher)</option>
-                <option value="♗">White Bishop (Philosopher)</option>
-                <option value="♘">White Knight (Philosopher)</option>
-                <option value="♙">White Pawn (Philosopher)</option>
-                <option value="♚">Black King (Psychologist)</option>
-                <option value="♛">Black Queen (Psychologist)</option>
-                <option value="♜">Black Rook (Psychologist)</option>
-                <option value="♝">Black Bishop (Psychologist)</option>
-                <option value="♞">Black Knight (Psychologist)</option>
-                <option value="♟">Black Pawn (Psychologist)</option>
+                <option value="♔">Weißer König (Philosoph)</option>
+                <option value="♕">Weißer Dame (Philosoph)</option>
+                <option value="♖">Weißer Turm (Philosoph)</option>
+                <option value="♗">Weißer Läufer (Philosoph)</option>
+                <option value="♘">Weißes Springer (Philosoph)</option>
+                <option value="♙">Weißer Bauer (Philosoph)</option>
+                <option value="♚">Schwarzer König (Psychologe)</option>
+                <option value="♛">Schwarze Dame (Psychologe)</option>
+                <option value="♜">Schwarzer Turm (Psychologe)</option>
+                <option value="♝">Schwarzer Läufer (Psychologe)</option>
+                <option value="♞">Schwarzes Springer (Psychologe)</option>
+                <option value="♟">Schwarzer Bauer (Psychologe)</option>
             </select>
-            <label for="title">Title:</label>
-            <input type="text" id="entryTitle" placeholder="Enter a title...">
+            <label for="title">Titel:</label>
+            <input type="text" id="entryTitle" placeholder="Gib einen Titel ein...">
             <label for="content">Text:</label>
-            <textarea id="entryContent" rows="4" placeholder="Enter your text..."></textarea>
-            <button id="saveEntry">Save</button>
-            <button id="cancelEntry">Cancel</button>
+            <div id="entryContent" contenteditable="true" placeholder="Gib deinen Text ein..."></div>
+            
+            <!-- Bild Hochladen -->
+            <div class="image-container">
+                <label for="imageUpload">Bild hochladen:</label>
+                <input type="file" id="imageUpload" accept="image/*">
+                <br>
+                <label for="imageSizeSlider">Bildgröße:</label>
+                <input type="range" id="imageSizeSlider" min="10" max="500" value="100">
+            </div>
+            
+            <button id="saveEntry">Speichern</button>
+            <button id="cancelEntry">Abbrechen</button>
         </div>
     </div>
 
@@ -114,45 +147,78 @@ the psychological-philosophical chessboard - a cognitive exchange
         const pieceType = document.getElementById("pieceType");
         const saveEntry = document.getElementById("saveEntry");
         const cancelEntry = document.getElementById("cancelEntry");
-        const entries = JSON.parse(localStorage.getItem("entries")) || {}; // Load entries from localStorage
+        const imageUpload = document.getElementById("imageUpload");
+        const imageSizeSlider = document.getElementById("imageSizeSlider");
+        const entries = JSON.parse(localStorage.getItem("entries")) || {}; // Lade Einträge aus dem LocalStorage
         let selectedSquare = null;
 
-        // Create chessboard squares (initially empty)
+        // Erstelle Schachbrettfelder (zu Beginn leer)
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const square = document.createElement("div");
                 square.className = "square";
                 square.dataset.position = `${row}-${col}`;
 
-                // Add event listener to open the modal when clicked
+                // Setze die Farbe der Felder je nach Reihe und Spalte (abwechselnde Farben)
+                if ((row + col) % 2 === 0) {
+                    square.style.backgroundColor = "#f0d9b5";  // Helles Feld
+                } else {
+                    square.style.backgroundColor = "#8b4513";  // Dunkles Feld
+                }
+
+                // Füge einen Event-Listener hinzu, um das Modal zu öffnen
                 square.addEventListener("click", () => openModal(square));
                 chessboard.appendChild(square);
             }
         }
 
-        // Open modal to create/edit an entry
+        // Öffne das Modal zum Erstellen/Bearbeiten eines Eintrags
         function openModal(square) {
             selectedSquare = square;
             const position = square.dataset.position;
             if (entries[position]) {
                 entryTitle.value = entries[position].title;
-                entryContent.value = entries[position].content;
+                entryContent.innerHTML = entries[position].content;
                 pieceType.value = entries[position].piece;
             } else {
                 entryTitle.value = "";
-                entryContent.value = "";
-                pieceType.value = "♔"; // Default to white king
+                entryContent.innerHTML = "";
+                pieceType.value = "♔"; // Standard: Weißer König
             }
             modal.style.display = "flex";
         }
 
-        // Save entry
+        // Handle Bild-Upload und Anzeige im Texteditor
+        imageUpload.addEventListener("change", () => {
+            const file = imageUpload.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement("img");
+                    img.src = event.target.result;
+                    img.style.maxWidth = `${imageSizeSlider.value}%`; // Setze Anfangsgröße des Bildes
+                    img.style.height = "auto";
+                    entryContent.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle Anpassung der Bildgröße
+        imageSizeSlider.addEventListener("input", () => {
+            const img = entryContent.querySelector("img");
+            if (img) {
+                img.style.maxWidth = `${imageSizeSlider.value}%`;
+            }
+        });
+
+        // Speichere den Eintrag
         saveEntry.addEventListener("click", () => {
             const title = entryTitle.value.trim();
-            const content = entryContent.value.trim();
+            const content = entryContent.innerHTML.trim();
             const piece = pieceType.value;
             if (!title || !content) {
-                alert("Please fill in both title and text.");
+                alert("Bitte sowohl Titel als auch Text ausfüllen.");
                 return;
             }
 
@@ -164,28 +230,29 @@ the psychological-philosophical chessboard - a cognitive exchange
                 timestamp: new Date().toLocaleString()
             };
 
-            // Save to localStorage
+            // Speichern in LocalStorage
             localStorage.setItem("entries", JSON.stringify(entries));
 
-            // Update the square with the selected piece
+            // Aktualisiere das Feld mit der gewählten Figur
             selectedSquare.textContent = entries[position].piece;
             modal.style.display = "none";
         });
 
-        // Cancel entry
+        // Abbrechen
         cancelEntry.addEventListener("click", () => {
             modal.style.display = "none";
         });
 
-        // Show entry on square click
+        // Zeige den Eintrag bei Klick auf das Feld an
         chessboard.addEventListener("click", (e) => {
             const square = e.target;
             const position = square.dataset.position;
             if (entries[position]) {
                 const entry = entries[position];
-                alert(`Title: <span class="entry-title">${entry.title}</span>\nText: ${entry.content}\nPiece: ${entry.piece}\nTimestamp: ${entry.timestamp}`);
+                alert(`Titel: <span class="entry-title">${entry.title}</span>\nText: ${entry.content}\nFigur: ${entry.piece}\nZeitstempel: ${entry.timestamp}`);
             }
         });
     </script>
 </body>
 </html>
+
