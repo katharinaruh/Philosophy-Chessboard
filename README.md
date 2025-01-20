@@ -1,36 +1,35 @@
 # Philosophy-Chessboard
-- a small philosophical game -
+the psychological-philosophical chessboard - a cognitive exchange
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Philosophical Chessboard</title>
+    <title>Philosophers and Psychologists Chessboard</title>
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: Times New Roman, serif;
             background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
         }
         .chessboard {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            width: 480px;
-            height: 480px;
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
             border: 2px solid #333;
+            margin-bottom: 20px;
         }
         .square {
+            width: 60px;
+            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            font-size: 14px;
-            color: white;
+            font-size: 18px;
         }
         .square:nth-child(odd) {
             background-color: #8b4513;
@@ -53,80 +52,107 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            text-align: center;
             max-width: 500px;
+            width: 100%;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .close {
-            margin-top: 10px;
+        .modal-content input, .modal-content textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            font-family: Times New Roman, serif;
+        }
+        .modal-content button {
+            padding: 8px 12px;
+            font-size: 14px;
             cursor: pointer;
-            color: #333;
         }
     </style>
 </head>
 <body>
+    <h1>Philosophers and Psychologists Chessboard</h1>
     <div class="chessboard" id="chessboard"></div>
 
     <div class="modal" id="modal">
         <div class="modal-content">
-            <p id="question"></p>
-            <button id="solutionButton">Show Solution</button>
-            <p id="solution" style="display: none; margin-top: 10px; font-weight: bold;"></p>
-            <div class="close" id="closeModal">Close</div>
+            <h2 id="modalTitle">Place a Piece</h2>
+            <label for="title">Title:</label>
+            <input type="text" id="entryTitle" placeholder="Enter a title...">
+            <label for="content">Text:</label>
+            <textarea id="entryContent" rows="4" placeholder="Enter your text..."></textarea>
+            <button id="saveEntry">Save</button>
+            <button id="cancelEntry">Cancel</button>
         </div>
     </div>
 
     <script>
-        const questions = [
-            { question: "What is the meaning of life?", solution: "The answer depends on individual belief systems." },
-            { question: "Is free will an illusion?", solution: "Some argue it's an illusion due to deterministic processes." },
-            { question: "Can we ever truly know anything?", solution: "Epistemology explores this deeply, with varied conclusions." },
-            { question: "What defines a good life?", solution: "Philosophers like Aristotle suggest virtue, while others focus on happiness." },
-            { question: "Does morality depend on culture?", solution: "Cultural relativism suggests yes, but universalists disagree." },
-            { question: "What is consciousness?", solution: "Consciousness remains one of philosophy's greatest mysteries." },
-            { question: "Is there an objective reality?", solution: "Some argue reality is subjective, shaped by perception." },
-            { question: "Are humans inherently good or evil?", solution: "Thinkers like Hobbes and Rousseau offer opposing views." },
-            { question: "What is justice?", solution: "Justice varies from fairness to moral righteousness in philosophical debates." },
-            { question: "Does life have inherent purpose?", solution: "Existentialists argue we must create our own purpose." }
-        ];
-
         const chessboard = document.getElementById("chessboard");
         const modal = document.getElementById("modal");
-        const questionElement = document.getElementById("question");
-        const solutionElement = document.getElementById("solution");
-        const solutionButton = document.getElementById("solutionButton");
-        const closeModal = document.getElementById("closeModal");
+        const entryTitle = document.getElementById("entryTitle");
+        const entryContent = document.getElementById("entryContent");
+        const saveEntry = document.getElementById("saveEntry");
+        const cancelEntry = document.getElementById("cancelEntry");
+        const entries = {}; // To store entries
+        let selectedSquare = null;
 
         // Create chessboard squares
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const square = document.createElement("div");
                 square.className = "square";
-                if ((row + col) % 2 === 0) {
-                    square.style.backgroundColor = "#f0d9b5";
-                } else {
-                    square.style.backgroundColor = "#8b4513";
-                }
-                square.addEventListener("click", () => {
-                    const randomIndex = Math.floor(Math.random() * questions.length);
-                    const selectedQuestion = questions[randomIndex];
-                    questionElement.textContent = selectedQuestion.question;
-                    solutionElement.textContent = selectedQuestion.solution;
-                    solutionElement.style.display = "none";
-                    modal.style.display = "flex";
-                });
+                square.dataset.position = `${row}-${col}`;
+                square.addEventListener("click", () => openModal(square));
                 chessboard.appendChild(square);
             }
         }
 
-        // Show solution
-        solutionButton.addEventListener("click", () => {
-            solutionElement.style.display = "block";
+        // Open modal to create/edit an entry
+        function openModal(square) {
+            selectedSquare = square;
+            const position = square.dataset.position;
+            if (entries[position]) {
+                entryTitle.value = entries[position].title;
+                entryContent.value = entries[position].content;
+            } else {
+                entryTitle.value = "";
+                entryContent.value = "";
+            }
+            modal.style.display = "flex";
+        }
+
+        // Save entry
+        saveEntry.addEventListener("click", () => {
+            const title = entryTitle.value.trim();
+            const content = entryContent.value.trim();
+            if (!title || !content) {
+                alert("Please fill in both title and text.");
+                return;
+            }
+
+            const position = selectedSquare.dataset.position;
+            entries[position] = {
+                title,
+                content,
+                timestamp: new Date().toLocaleString(),
+                piece: (position[0] % 2 === 0) ? "♟" : "♙" // Black for Psychologists, White for Philosophers
+            };
+
+            selectedSquare.textContent = entries[position].piece;
+            modal.style.display = "none";
         });
 
-        // Close modal
-        closeModal.addEventListener("click", () => {
+        // Cancel entry
+        cancelEntry.addEventListener("click", () => {
             modal.style.display = "none";
+        });
+
+        // Show entry on square click
+        chessboard.addEventListener("click", (e) => {
+            const square = e.target;
+            const position = square.dataset.position;
+            if (entries[position]) {
+                alert(`Title: ${entries[position].title}\nText: ${entries[position].content}\nTimestamp: ${entries[position].timestamp}`);
+            }
         });
     </script>
 </body>
