@@ -1,7 +1,6 @@
 # Chessboard
 the psychological-philosophical chessboard - a cognitive exchange
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -117,31 +116,14 @@ the psychological-philosophical chessboard - a cognitive exchange
         const entries = JSON.parse(localStorage.getItem("entries")) || {}; // Load entries from localStorage
         let selectedSquare = null;
 
-        // Define initial pieces placement
-        const initialBoard = [
-            ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"],
-            ["♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            ["♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"],
-            ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"]
-        ];
-
-        // Create chessboard squares and place pieces
+        // Create chessboard squares (initially empty)
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const square = document.createElement("div");
                 square.className = "square";
                 square.dataset.position = `${row}-${col}`;
 
-                // Set initial piece if available
-                const position = `${row}-${col}`;
-                if (initialBoard[row][col]) {
-                    square.textContent = initialBoard[row][col];
-                }
-
+                // Add event listener to open the modal when clicked
                 square.addEventListener("click", () => openModal(square));
                 chessboard.appendChild(square);
             }
@@ -206,5 +188,3 @@ the psychological-philosophical chessboard - a cognitive exchange
     </script>
 </body>
 </html>
-
-
