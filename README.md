@@ -1,5 +1,5 @@
 # Philosophy-Chessboard
-
+- a small philosophical game -
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,13 +18,12 @@
         }
         .chessboard {
             display: grid;
-            grid-template-columns: repeat(8, 60px);
-            grid-template-rows: repeat(8, 60px);
+            grid-template-columns: repeat(8, 1fr);
+            width: 480px;
+            height: 480px;
             border: 2px solid #333;
         }
         .square {
-            width: 60px;
-            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -81,7 +80,13 @@
             { question: "What is the meaning of life?", solution: "The answer depends on individual belief systems." },
             { question: "Is free will an illusion?", solution: "Some argue it's an illusion due to deterministic processes." },
             { question: "Can we ever truly know anything?", solution: "Epistemology explores this deeply, with varied conclusions." },
-            // Add more questions and solutions up to 300
+            { question: "What defines a good life?", solution: "Philosophers like Aristotle suggest virtue, while others focus on happiness." },
+            { question: "Does morality depend on culture?", solution: "Cultural relativism suggests yes, but universalists disagree." },
+            { question: "What is consciousness?", solution: "Consciousness remains one of philosophy's greatest mysteries." },
+            { question: "Is there an objective reality?", solution: "Some argue reality is subjective, shaped by perception." },
+            { question: "Are humans inherently good or evil?", solution: "Thinkers like Hobbes and Rousseau offer opposing views." },
+            { question: "What is justice?", solution: "Justice varies from fairness to moral righteousness in philosophical debates." },
+            { question: "Does life have inherent purpose?", solution: "Existentialists argue we must create our own purpose." }
         ];
 
         const chessboard = document.getElementById("chessboard");
@@ -92,18 +97,25 @@
         const closeModal = document.getElementById("closeModal");
 
         // Create chessboard squares
-        for (let i = 0; i < 64; i++) {
-            const square = document.createElement("div");
-            square.className = "square";
-            square.addEventListener("click", () => {
-                const randomIndex = Math.floor(Math.random() * questions.length);
-                const selectedQuestion = questions[randomIndex];
-                questionElement.textContent = selectedQuestion.question;
-                solutionElement.textContent = selectedQuestion.solution;
-                solutionElement.style.display = "none";
-                modal.style.display = "flex";
-            });
-            chessboard.appendChild(square);
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const square = document.createElement("div");
+                square.className = "square";
+                if ((row + col) % 2 === 0) {
+                    square.style.backgroundColor = "#f0d9b5";
+                } else {
+                    square.style.backgroundColor = "#8b4513";
+                }
+                square.addEventListener("click", () => {
+                    const randomIndex = Math.floor(Math.random() * questions.length);
+                    const selectedQuestion = questions[randomIndex];
+                    questionElement.textContent = selectedQuestion.question;
+                    solutionElement.textContent = selectedQuestion.solution;
+                    solutionElement.style.display = "none";
+                    modal.style.display = "flex";
+                });
+                chessboard.appendChild(square);
+            }
         }
 
         // Show solution
@@ -118,3 +130,4 @@
     </script>
 </body>
 </html>
+
