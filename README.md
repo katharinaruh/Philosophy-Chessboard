@@ -1,6 +1,7 @@
 # Philosophy-Chessboard
 - a small philosophical game -
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
