@@ -1,6 +1,7 @@
 # Philosophy-Chessboard
 the psychological-philosophical chessboard - a cognitive exchange
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,8 +19,9 @@ the psychological-philosophical chessboard - a cognitive exchange
         }
         .chessboard {
             display: grid;
-            grid-template-columns: repeat(8, 60px);
-            grid-template-rows: repeat(8, 60px);
+            grid-template-columns: repeat(8, 1fr);
+            width: 480px;
+            height: 480px;
             border: 2px solid #333;
             margin-bottom: 20px;
         }
@@ -29,13 +31,14 @@ the psychological-philosophical chessboard - a cognitive exchange
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 18px;
-        }
-        .square:nth-child(odd) {
-            background-color: #8b4513;
+            font-size: 24px;
+            cursor: pointer;
         }
         .square:nth-child(even) {
             background-color: #f0d9b5;
+        }
+        .square:nth-child(odd) {
+            background-color: #8b4513;
         }
         .modal {
             position: fixed;
@@ -56,7 +59,7 @@ the psychological-philosophical chessboard - a cognitive exchange
             width: 100%;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .modal-content input, .modal-content textarea {
+        .modal-content input, .modal-content textarea, .modal-content select {
             width: 100%;
             margin-bottom: 10px;
             padding: 8px;
@@ -76,6 +79,21 @@ the psychological-philosophical chessboard - a cognitive exchange
     <div class="modal" id="modal">
         <div class="modal-content">
             <h2 id="modalTitle">Place a Piece</h2>
+            <label for="pieceType">Choose a Piece:</label>
+            <select id="pieceType">
+                <option value="♔">White King (Philosopher)</option>
+                <option value="♕">White Queen (Philosopher)</option>
+                <option value="♖">White Rook (Philosopher)</option>
+                <option value="♗">White Bishop (Philosopher)</option>
+                <option value="♘">White Knight (Philosopher)</option>
+                <option value="♙">White Pawn (Philosopher)</option>
+                <option value="♚">Black King (Psychologist)</option>
+                <option value="♛">Black Queen (Psychologist)</option>
+                <option value="♜">Black Rook (Psychologist)</option>
+                <option value="♝">Black Bishop (Psychologist)</option>
+                <option value="♞">Black Knight (Psychologist)</option>
+                <option value="♟">Black Pawn (Psychologist)</option>
+            </select>
             <label for="title">Title:</label>
             <input type="text" id="entryTitle" placeholder="Enter a title...">
             <label for="content">Text:</label>
@@ -90,6 +108,7 @@ the psychological-philosophical chessboard - a cognitive exchange
         const modal = document.getElementById("modal");
         const entryTitle = document.getElementById("entryTitle");
         const entryContent = document.getElementById("entryContent");
+        const pieceType = document.getElementById("pieceType");
         const saveEntry = document.getElementById("saveEntry");
         const cancelEntry = document.getElementById("cancelEntry");
         const entries = {}; // To store entries
@@ -113,9 +132,11 @@ the psychological-philosophical chessboard - a cognitive exchange
             if (entries[position]) {
                 entryTitle.value = entries[position].title;
                 entryContent.value = entries[position].content;
+                pieceType.value = entries[position].piece;
             } else {
                 entryTitle.value = "";
                 entryContent.value = "";
+                pieceType.value = "♔";
             }
             modal.style.display = "flex";
         }
@@ -124,6 +145,7 @@ the psychological-philosophical chessboard - a cognitive exchange
         saveEntry.addEventListener("click", () => {
             const title = entryTitle.value.trim();
             const content = entryContent.value.trim();
+            const piece = pieceType.value;
             if (!title || !content) {
                 alert("Please fill in both title and text.");
                 return;
@@ -133,8 +155,8 @@ the psychological-philosophical chessboard - a cognitive exchange
             entries[position] = {
                 title,
                 content,
-                timestamp: new Date().toLocaleString(),
-                piece: (position[0] % 2 === 0) ? "♟" : "♙" // Black for Psychologists, White for Philosophers
+                piece,
+                timestamp: new Date().toLocaleString()
             };
 
             selectedSquare.textContent = entries[position].piece;
@@ -151,9 +173,10 @@ the psychological-philosophical chessboard - a cognitive exchange
             const square = e.target;
             const position = square.dataset.position;
             if (entries[position]) {
-                alert(`Title: ${entries[position].title}\nText: ${entries[position].content}\nTimestamp: ${entries[position].timestamp}`);
+                alert(`Title: ${entries[position].title}\nText: ${entries[position].content}\nPiece: ${entries[position].piece}\nTimestamp: ${entries[position].timestamp}`);
             }
         });
     </script>
 </body>
 </html>
+
