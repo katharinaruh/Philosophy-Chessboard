@@ -1,6 +1,3 @@
-# Chessboard
-the psychological-philosophical chessboard - a cognitive exchange
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -146,8 +143,8 @@ the psychological-philosophical chessboard - a cognitive exchange
         const cancelEntry = document.getElementById("cancelEntry");
         const imageUpload = document.getElementById("imageUpload");
         const imageSizeSlider = document.getElementById("imageSizeSlider");
-        const entries = JSON.parse(localStorage.getItem("entries")) || {}; // Lade Einträge aus dem LocalStorage
         let selectedSquare = null;
+        const entries = JSON.parse(localStorage.getItem("entries")) || {}; // Lade Einträge aus dem LocalStorage
 
         // Erstelle Schachbrettfelder (zu Beginn leer)
         for (let row = 0; row < 8; row++) {
