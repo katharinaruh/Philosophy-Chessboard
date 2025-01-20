@@ -1,4 +1,4 @@
-# Philosophy-Chessboard
+# Chessboard
 the psychological-philosophical chessboard - a cognitive exchange
 
 <!DOCTYPE html>
@@ -70,6 +70,9 @@ the psychological-philosophical chessboard - a cognitive exchange
             font-size: 14px;
             cursor: pointer;
         }
+        .entry-title {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -111,15 +114,34 @@ the psychological-philosophical chessboard - a cognitive exchange
         const pieceType = document.getElementById("pieceType");
         const saveEntry = document.getElementById("saveEntry");
         const cancelEntry = document.getElementById("cancelEntry");
-        const entries = {}; // To store entries
+        const entries = JSON.parse(localStorage.getItem("entries")) || {}; // Load entries from localStorage
         let selectedSquare = null;
 
-        // Create chessboard squares
+        // Define initial pieces placement
+        const initialBoard = [
+            ["♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"],
+            ["♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null],
+            ["♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"],
+            ["♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"]
+        ];
+
+        // Create chessboard squares and place pieces
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const square = document.createElement("div");
                 square.className = "square";
                 square.dataset.position = `${row}-${col}`;
+
+                // Set initial piece if available
+                const position = `${row}-${col}`;
+                if (initialBoard[row][col]) {
+                    square.textContent = initialBoard[row][col];
+                }
+
                 square.addEventListener("click", () => openModal(square));
                 chessboard.appendChild(square);
             }
@@ -136,7 +158,7 @@ the psychological-philosophical chessboard - a cognitive exchange
             } else {
                 entryTitle.value = "";
                 entryContent.value = "";
-                pieceType.value = "♔";
+                pieceType.value = "♔"; // Default to white king
             }
             modal.style.display = "flex";
         }
@@ -159,6 +181,10 @@ the psychological-philosophical chessboard - a cognitive exchange
                 timestamp: new Date().toLocaleString()
             };
 
+            // Save to localStorage
+            localStorage.setItem("entries", JSON.stringify(entries));
+
+            // Update the square with the selected piece
             selectedSquare.textContent = entries[position].piece;
             modal.style.display = "none";
         });
@@ -173,10 +199,12 @@ the psychological-philosophical chessboard - a cognitive exchange
             const square = e.target;
             const position = square.dataset.position;
             if (entries[position]) {
-                alert(`Title: ${entries[position].title}\nText: ${entries[position].content}\nPiece: ${entries[position].piece}\nTimestamp: ${entries[position].timestamp}`);
+                const entry = entries[position];
+                alert(`Title: <span class="entry-title">${entry.title}</span>\nText: ${entry.content}\nPiece: ${entry.piece}\nTimestamp: ${entry.timestamp}`);
             }
         });
     </script>
 </body>
 </html>
+
 
