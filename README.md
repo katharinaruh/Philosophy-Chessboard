@@ -16,8 +16,8 @@
         }
         .chessboard {
             display: grid;
-            grid-template-columns: repeat(8, 60px); /* 8 Spalten mit fester Breite */
-            grid-template-rows: repeat(8, 60px);    /* 8 Reihen mit fester Höhe */
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
             width: 480px;
             height: 480px;
             border: 2px solid #333;
@@ -30,14 +30,13 @@
             font-size: 24px;
             cursor: pointer;
         }
-        /* Abwechselnde Farben für Schachbrettfelder */
         .chessboard .square:nth-child(odd):nth-child(odd),
         .chessboard .square:nth-child(even):nth-child(even) {
-            background-color: #f0d9b5; /* Helles Feld */
+            background-color: #f0d9b5;
         }
         .chessboard .square:nth-child(odd):nth-child(even),
         .chessboard .square:nth-child(even):nth-child(odd) {
-            background-color: #8b4513; /* Dunkles Feld */
+            background-color: #8b4513;
         }
 
         .modal {
@@ -79,13 +78,13 @@
             border: 1px solid #ccc;
             padding: 8px;
             font-family: Times New Roman, serif;
-            overflow-y: auto;  /* Ermöglicht das Scrollen */
-            max-height: 300px; /* Maximale Höhe des Textfeldes */
+            overflow-y: auto;
+            max-height: 300px;
         }
         #entryContent img {
             max-width: 100%;
         }
-        .image-container {
+        .file-container {
             margin-bottom: 10px;
         }
         #imageSizeSlider {
@@ -103,7 +102,7 @@
             <label for="pieceType">Wähle eine Figur:</label>
             <select id="pieceType">
                 <option value="♔">Weißer König (Philosoph)</option>
-                <option value="♕">Weißer Dame (Philosoph)</option>
+                <option value="♕">Weiße Dame (Philosoph)</option>
                 <option value="♖">Weißer Turm (Philosoph)</option>
                 <option value="♗">Weißer Läufer (Philosoph)</option>
                 <option value="♘">Weißes Springer (Philosoph)</option>
@@ -119,16 +118,22 @@
             <input type="text" id="entryTitle" placeholder="Gib einen Titel ein...">
             <label for="content">Text:</label>
             <div id="entryContent" contenteditable="true" placeholder="Gib deinen Text ein..."></div>
-            
+
+            <!-- Datei Hochladen -->
+            <div class="file-container">
+                <label for="fileUpload">Datei hochladen:</label>
+                <input type="file" id="fileUpload" accept="image/*,.pdf,.doc,.docx,.txt">
+            </div>
+
             <!-- Bild Hochladen -->
-            <div class="image-container">
+            <div class="file-container">
                 <label for="imageUpload">Bild hochladen:</label>
                 <input type="file" id="imageUpload" accept="image/*">
                 <br>
                 <label for="imageSizeSlider">Bildgröße:</label>
                 <input type="range" id="imageSizeSlider" min="10" max="500" value="100">
             </div>
-            
+
             <button id="saveEntry">Speichern</button>
             <button id="cancelEntry">Abbrechen</button>
         </div>
@@ -143,36 +148,29 @@
         const saveEntry = document.getElementById("saveEntry");
         const cancelEntry = document.getElementById("cancelEntry");
         const imageUpload = document.getElementById("imageUpload");
+        const fileUpload = document.getElementById("fileUpload");
         const imageSizeSlider = document.getElementById("imageSizeSlider");
-        const entries = JSON.parse(localStorage.getItem("entries")) || {}; // Lade Einträge aus dem LocalStorage
+        const entries = JSON.parse(localStorage.getItem("entries")) || {}; 
         let selectedSquare = null;
 
-        // Erstelle Schachbrettfelder (zu Beginn leer)
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const square = document.createElement("div");
                 square.className = "square";
                 square.dataset.position = `${row}-${col}`;
-
-                // Setze die Farbe der Felder je nach Reihe und Spalte (abwechselnde Farben)
                 if ((row + col) % 2 === 0) {
-                    square.style.backgroundColor = "#f0d9b5";  // Helles Feld
+                    square.style.backgroundColor = "#f0d9b5";
                 } else {
-                    square.style.backgroundColor = "#8b4513";  // Dunkles Feld
+                    square.style.backgroundColor = "#8b4513";
                 }
-
-                // Füge den gespeicherten Eintrag oder die Schachfigur hinzu
                 if (entries[`${row}-${col}`]) {
                     square.textContent = entries[`${row}-${col}`].piece;
                 }
-
-                // Füge einen Event-Listener hinzu, um das Modal zu öffnen
                 square.addEventListener("click", () => openModal(square));
                 chessboard.appendChild(square);
             }
         }
 
-        // Öffne das Modal zum Erstellen/Bearbeiten eines Eintrags
         function openModal(square) {
             selectedSquare = square;
             const position = square.dataset.position;
@@ -183,12 +181,11 @@
             } else {
                 entryTitle.value = "";
                 entryContent.innerHTML = "";
-                pieceType.value = "♔"; // Standard: Weißer König
+                pieceType.value = "♔";
             }
             modal.style.display = "flex";
         }
 
-        // Handle Bild-Upload und Anzeige im Texteditor
         imageUpload.addEventListener("change", () => {
             const file = imageUpload.files[0];
             if (file) {
@@ -196,7 +193,7 @@
                 reader.onload = function(event) {
                     const img = document.createElement("img");
                     img.src = event.target.result;
-                    img.style.maxWidth = `${imageSizeSlider.value}%`; // Setze Anfangsgröße des Bildes
+                    img.style.maxWidth = `${imageSizeSlider.value}%`;
                     img.style.height = "auto";
                     entryContent.appendChild(img);
                 };
@@ -204,7 +201,15 @@
             }
         });
 
-        // Handle Anpassung der Bildgröße
+        fileUpload.addEventListener("change", () => {
+            const file = fileUpload.files[0];
+            if (file) {
+                const fileName = document.createElement("p");
+                fileName.textContent = `Datei: ${file.name}`;
+                entryContent.appendChild(fileName);
+            }
+        });
+
         imageSizeSlider.addEventListener("input", () => {
             const img = entryContent.querySelector("img");
             if (img) {
@@ -212,7 +217,6 @@
             }
         });
 
-        // Speichere den Eintrag
         saveEntry.addEventListener("click", () => {
             const title = entryTitle.value.trim();
             const content = entryContent.innerHTML.trim();
@@ -230,15 +234,11 @@
                 timestamp: new Date().toLocaleString()
             };
 
-            // Speichern in LocalStorage
             localStorage.setItem("entries", JSON.stringify(entries));
-
-            // Aktualisiere das Feld mit der gewählten Figur
             selectedSquare.textContent = entries[position].piece;
             modal.style.display = "none";
         });
 
-        // Abbrechen
         cancelEntry.addEventListener("click", () => {
             modal.style.display = "none";
         });
